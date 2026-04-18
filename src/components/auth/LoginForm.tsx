@@ -56,6 +56,8 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [role_id, setRoleId] = useState("");
+  const adminRoles =
+    rolesData?.data?.filter((role) => !["user", "agent"].includes(role.name.toLowerCase())) ?? [];
 
   useEffect(() => {
     if (!brandingData || !isSuccess) return;
@@ -75,15 +77,15 @@ const LoginForm = () => {
   }, [brandingData, isSuccess]);
 
   useEffect(() => {
-    if (rolesData?.success && rolesData.data.length > 0 && !role_id) {
-      const superAdmin = rolesData.data.find((r) => r.name.toLowerCase() === "super_admin");
+    if (rolesData?.success && adminRoles.length > 0 && !role_id) {
+      const superAdmin = adminRoles.find((r) => r.name.toLowerCase() === "super_admin");
       if (superAdmin) {
         setRoleId(superAdmin._id);
       } else {
-        setRoleId(rolesData.data[0]._id);
+        setRoleId(adminRoles[0]._id);
       }
     }
-  }, [rolesData, role_id]);
+  }, [adminRoles, role_id, rolesData?.success]);
 
   const fillDemoCredentials = () => {
     setIdentifier("admin@example.com");
@@ -170,9 +172,7 @@ const LoginForm = () => {
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent className="dark:bg-(--card-color) dark:border-(--card-border-color) z-110">
-                    {rolesData?.data
-                      ?.filter((role) => !["user", "agent"].includes(role.name.toLowerCase()))
-                      .map((role) => (
+                    {adminRoles.map((role) => (
                         <SelectItem key={role._id} value={role._id} className="cursor-pointer dark:hover:bg-zinc-800">
                           {role.name}
                         </SelectItem>
